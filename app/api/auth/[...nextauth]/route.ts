@@ -21,9 +21,9 @@ callbacks: {
     const email = user.email || ''
 
     // Check if email ends with your university domain
-    if (!email.endsWith('@university.edu')) {
+    if (!email.endsWith('@outlook.com') && !email.endsWith('@hotmail.com') && !email.endsWith('@live.com')) {
       // Return false to block login
-      // The user is redirected to /auth/error?error=AccessDenied
+      // The user is redirected to /auth/ error?error=AccessDenied
       return false
     }
 
