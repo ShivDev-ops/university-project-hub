@@ -1,15 +1,23 @@
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
-import { generateOTP, storeOTP, sendOTPEmail } from '@/lib/otp'  // from Phase 2
+import { generateOTP, storeOTP, sendOTPEmail } from '@/lib/otp'
+
 export async function POST() {
-  // Get the current logged-in user's session
   const session = await getServerSession()
-  if (!session?.user?.email) {
+
+  // Check session exists
+  if (!session?.user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
+
+  // Check id and email are defined before using them
+  if (!session.user.id || !session.user.email) {
+    return NextResponse.json({ error: 'User data incomplete' }, { status: 400 })
+  }
+
   // Generate a new OTP, store it in DB, send it via email
   const otp = generateOTP()
-  await storeOTP(session.user.id, otp)
-  await sendOTPEmail(session.user.email, otp)
+  await storeOTP(session.user.id, otp)        // ← id is now guaranteed string
+  await sendOTPEmail(session.user.email, otp)  // ← email is now guaranteed string
   return NextResponse.json({ success: true })
 }
